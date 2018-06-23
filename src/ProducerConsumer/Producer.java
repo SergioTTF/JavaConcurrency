@@ -6,7 +6,7 @@ import java.util.Random;
 public class Producer extends Thread {
 
     private int id;
-    private ArrayList<Integer> numList;
+    private final ArrayList<Integer> numList;
     private int maxSize;
     private Random rnd;
 
@@ -20,13 +20,13 @@ public class Producer extends Thread {
     @Override
     public void run() {
         while (true) {
-            //If the list is full the Producer Thread will sleep for 1 second
+            //If the list is full the Producer Thread will sleep for 0.2 seconds
             if (this.maxSize > this.numList.size()) {
                 int number = rnd.nextInt(101);
                 this.insert(number);
             } else {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
