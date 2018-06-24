@@ -1,15 +1,16 @@
-package SharedBank;
+package SharedBankAlternative;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class User extends Thread {
-    private double balance;
+    private AtomicInteger balance;
     private int id;
     private Random random;
 
-    public User (int identifier, double initBalance){
+    public User (int identifier, AtomicInteger integer){
         this.id = identifier;
-        this.balance = initBalance;
+        this.balance = integer;
         this.random = new Random();
     }
 
@@ -18,7 +19,7 @@ public class User extends Thread {
         while (true) {
             // select random 0 or 1
             int rnd = random.nextInt(2);
-            double amount = random.nextInt(500) * 1.00;
+            int amount = random.nextInt(500);
             if (rnd==0) {
                 this.deposit(amount);
             } else {
@@ -26,13 +27,13 @@ public class User extends Thread {
             }
         }
     }
-    public synchronized void deposit(double num) {
-        this.balance += num;
+    public void deposit(int num) {
+        this.balance.addAndGet(num);
         System.out.println("User " + this.id + " deposited " + num);
     }
-    public synchronized void withdraw(double num) {
-        if (this.balance > num) {
-            this.balance -= num;
+    public void withdraw(int num) {
+        if (this.balance.get() > num) {
+            this.balance.addAndGet(num * (-1));
             System.out.println("User " + this.id + " withdrew " + num);
         } else {
             System.out.println("User " + this.id + " failed to withdrew " + num);
@@ -41,7 +42,7 @@ public class User extends Thread {
 
     public static void main (String[] Args) {
         //Simulating a shared bank account with 3 users
-        double initBalance = 0.00;
+        AtomicInteger initBalance = new AtomicInteger();
         for(int i=0; i<3; i++) {
             (new Thread(new User(i, initBalance))).start();
         }
